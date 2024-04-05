@@ -13,6 +13,8 @@ destinatario_lista = []
 valor_deposito = []
 data_pix_lista = []
 data_deposito_lista = []
+comprovante_depo = []
+comprovante_pix = []
 
 def traco(x = 50):
       for i in range(0,x):
@@ -59,6 +61,12 @@ def menu_cadastro():
       saldo_lista.append(saldo)
       valor_deposito.append(saldo)  
       random_conta()
+      global P
+      p = 0 
+      if cpf in cpf_lista :
+            P = cpf_lista.index(cpf)
+      else : 
+            p = -1
       limpar()
       traco()
       print(
@@ -206,9 +214,9 @@ def comprovante():# 3 opção do menu inserir
       escolha_comprovante = escolha()
       if  escolha_comprovante == 1 :
             limpar()
-            print("============DEPÓSITOS===========")
+            print("============DEPÓSITOS===========")       
             for valo , horario  in zip(valor_deposito,data_deposito_lista) :
-                  print(f"PARABÉNS, VOCÊ DEPOSITOU {valo} REAIS EM {horario}")
+                  print(f"PARABÉNS, VOCÊ DEPOSITOU {valo} REAIS EM {horario}")    
             time.sleep(5)      
             inserir()
       elif  escolha_comprovante == 2 :
@@ -283,6 +291,11 @@ def sairConta():#funções sair conta e sair do banco
       limpar()
       print(f"Saindo da sua conta,{nome_lista[-1]}")
       time.sleep(3)
+      comprovante_depo.append(valor_deposito.copy())
+      comprovante_depo.append(data_deposito_lista.copy())
+      comprovante_pix.append(valor_pix_lista.copy())
+      comprovante_pix.append(destinatario_lista.copy())
+      comprovante_pix.append(data_pix_lista.copy())
       limpar()
       iniciar()
 def sair():
