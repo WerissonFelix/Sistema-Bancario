@@ -4,10 +4,11 @@ import random
 import time
 import os
 import sys
-cpf_lista = []
-nome_lista = []
-saldo_lista = []
-numero_conta_lista = []
+cpf = 0
+nome = ''
+saldo = 0.0
+numero_conta = 0
+pessoas = []
 valor_pix_lista = []
 destinatario_lista = []
 valor_deposito = []
@@ -20,51 +21,69 @@ def traco(x = 50):
       for i in range(0,x):
             print("=", end="")
       print("\n")
+
 def escolha():
       guia = int(input("digite o número da guia que deseja ir"))
       return guia
+
 def limpar():
       os.system('cls') or None
+
 def iniciar():
       limpar()
       traco() 
       print("Bem-vindo ao banco Félix, comece escolhendo uma opção\n"
             "1.CADASTRAR\n"
-            "2.SAIR DO BANCO"
+            "2.ENTRAR\n"
+            "3.SAIR DO BANCO"
             )
       a = escolha()
       traco()
       if a == 1 :
-            resetar(valor_pix_lista,destinatario_lista,valor_deposito,data_deposito_lista,data_pix_lista)  
+            menu_cadastro()
       elif a == 2 :
+            cpf = int(input("digite o cpf da conta que desejar entrar"))
+            nome = input("digite o nome da conta que deseja entrar")
+            saldo = float(input("digite o saldo da conta que deseja entrar"))
+            numero_conta = int(input("digite o número da conta da pessoa que deseja entra"))
+            try :
+                  cpf,nome,saldo,numero_conta = pessoa
+            except(NameError):
+                  print("parece que ainda não há nenhuma conta cadastrada")
+                  time.sleep(5)
+                  iniciar()      
+            if pessoa in pessoas:
+                  print(f"entrando em {cpf}")
+                  time.sleep(3)
+                  menu_principal()   
+            else:
+                  print("cpf não encontrado, tente com outro ;)")
+                  time.sleep(5)
+                  iniciar()                   
+      elif a == 3 :
             sair()
-def random_conta():
+     
+def menu_cadastro():
+      limpar()
+      traco()  
+      nome = input("Digite seu nome")
+      cpf = int(input("Digite seu cpf"))
+      saldo = float(input("Quanto deseja depositar??"))
       numero_conta =  random.randrange(0,1000,3)
-      numero_conta_lista.append(numero_conta)
-def verificacao(x,y):
-      if x in y:
+      if cpf in pessoas:
             print("Alguém já tem este cpf, tente com outro")
             time.sleep(5)
             menu_cadastro()
       else :
-            y.append(x)      
-def menu_cadastro():
-      limpar()
-      traco()    
-      cpf = int(input("Digite seu cpf"))
-      nome = input("Digite seu nome")
-      saldo = float(input("Quanto deseja depositar??"))
-      verificacao(cpf,cpf_lista)
-      deposito_data = datetime.now()
-      data_deposito_lista.append(deposito_data)
-      nome_lista.append(nome)
-      saldo_lista.append(saldo)
-      valor_deposito.append(saldo)  
-      random_conta()
-      global P
-      p = 0 
-      if cpf in cpf_lista :
-            P = cpf_lista.index(cpf)
+            pessoas.append([nome,cpf,saldo,numero_conta])
+            deposito_data = datetime.now()
+            data_deposito_lista.append(deposito_data)
+            valor_deposito.append(saldo)
+            
+                
+      global p 
+      if nome in pessoas :
+            p = pessoas.index(nome)
       else : 
             p = -1
       limpar()
@@ -87,8 +106,15 @@ def menu_cadastro():
 def menu_principal():
       limpar()
       traco()
+      global pessoa
+      for i in range(len(pessoas)): 
+            if cpf in pessoas : 
+                  pessoa = pessoas[i]
+                  break
+            else:
+                  pessoa = pessoas[i]      
       print(
-            f"BEM-VINDO AO BANCO FÉLIX,{nome_lista[-1]}\n"
+            f"BEM-VINDO AO BANCO FÉLIX,{pessoa[0]}\n"
             "MENU PRINCIPAL\n"
             "1. INSERIR\n"
             "2. ALTERAR\n"
@@ -106,10 +132,10 @@ def menu_principal():
             limpar()
             traco()
             print("INFORMAÇÕES DA CONTA :\n"
-            f"CPF:{cpf_lista[-1]}\n"
-            f"NOME:{nome_lista[-1]}\n"
-            f"NÚMERO DA CONTA:{numero_conta_lista[-1]}\n"
-            f"SALDO BANCÁRIO: {saldo_lista[-1]}"
+            f"NOME:{pessoa[0]}\n"
+            f"CPF:{pessoa[1]}\n"            
+            f"SALDO BANCÁRIO: {pessoa[2]}\n"
+            f"NÚMERO DA CONTA:{pessoa[3]}\n"            
             )
             time.sleep(10)
             traco()
@@ -119,14 +145,14 @@ def menu_principal():
             traco()
             exclui = input("EXCLUIR CONTA?")
             if exclui.lower() == "sim" :
-                  excluir(cpf_lista,data_pix_lista,numero_conta_lista,saldo_lista,valor_pix_lista)
+                  exit()
             elif exclui.lower() == "não" :
                   menu_principal()  
       elif c == 5 :
             sairConta()  
       elif c == 6 :
             sair()              
-      traco()
+      traco() 
 def inserir():
       limpar()
       traco()
@@ -146,12 +172,12 @@ def inserir():
             comprovante()
       elif d == 4 :
             menu_principal()  
-      traco()  
+      traco()      
 def pix(): # 1 opção do menu inserir
       limpar()
       traco()
       destinatario = int(input("Digite o número da conta do destinatário do pix"))
-      if destinatario == numero_conta_lista[-1]:
+      if destinatario == pessoa[0]:
             print('Você digitou o número da sua conta, se quiser depositar, vá à segunda guia do menu "inserir"')
             time.sleep(7)
             inserir()
@@ -160,14 +186,14 @@ def pix(): # 1 opção do menu inserir
             if valor_pix > 0 : 
                   valor_pix_lista.append(valor_pix)
                   enviar = input("Deseja enviar?")
-                  if saldo_lista[-1] >= valor_pix_lista[-1] :
+                  if pessoa[2] >= valor_pix_lista[-1] :
                         if enviar.lower() == "sim":
                               data_pix  = datetime.now()
                               destinatario_lista.append(destinatario)                
                               data_pix_lista.append(data_pix)                
-                              saldo_lista[-1] = saldo_lista[-1] - valor_pix_lista[-1]
-                              print(f"PIX NO VALO DE {valor_pix_lista[-1]} FOI ENVIADO PARA {destinatario_lista[-1]} POR {numero_conta_lista[-1]} NA DATA {data_pix_lista[-1]}")
-                              print(f"AGORA, VOCÊ POSSUI {saldo_lista[-1]} REAIS")
+                              pessoa[2] = pessoa[2] - valor_pix_lista[-1]
+                              print(f"PIX NO VALO DE {valor_pix_lista[-1]} FOI ENVIADO PARA {destinatario_lista[-1]} POR {pessoa[3]} NA DATA {data_pix_lista[-1]}")
+                              print(f"AGORA, VOCÊ POSSUI {pessoa[2]} REAIS")
                               print('O comprovante desaparecerá em 7 segundos. Se quiser vê-lo, vá à guia "3" do menu inserir')
                               time.sleep(10)
                               inserir()         
@@ -175,7 +201,7 @@ def pix(): # 1 opção do menu inserir
                               inserir()
                   else : 
                         valor_pix_lista.pop()
-                        print("PARECE QUE SEU SALDO É INSUFICIENTE, TENTE COM UM VALOR MENOR OU IGUAL AO SEU SALDO BANCÁRIO QUE É : ",saldo_lista[-1]) 
+                        print("PARECE QUE SEU SALDO É INSUFICIENTE, TENTE COM UM VALOR MENOR OU IGUAL AO SEU SALDO BANCÁRIO QUE É : ",pessoa[2]) 
                         time.sleep(7)
                         inserir()  
             else :
@@ -192,9 +218,9 @@ def depositar(): # 2 opção do menu inserir
       if deposita.lower() == "sim":
             deposito_data = datetime.now()                   
             data_deposito_lista.append(deposito_data)
-            saldo_lista[-1] = saldo_lista[-1] + valor_deposito[-1]
+            pessoa[2] = saldo_lista[2] + valor_deposito[-1]
             print(f"PARABÉNS, VOCÊ DEPOSITOU {valor_deposito[-1]} REAIS EM {data_deposito_lista[-1]}")
-            print(f"AGORA, VOCÊ TEM {saldo_lista[-1]} REAIS")
+            print(f"AGORA, VOCÊ TEM {pessoa[2]} REAIS")
             time.sleep(5)
             inserir()
       elif deposita.lower() == "não":
@@ -223,7 +249,7 @@ def comprovante():# 3 opção do menu inserir
             limpar()
             print("==========PIX=========")
             for valor , destino , hora in zip(valor_pix_lista,destinatario_lista,data_pix_lista) :
-                  print(f"PIX NO VALO DE {valor} FOI ENVIADO PARA {destino} POR {numero_conta_lista[-1]} EM {hora}") 
+                  print(f"PIX NO VALO DE {valor} FOI ENVIADO PARA {destino} POR {pessoa[3]} EM {hora}") 
             time.sleep(10)                       
             inserir()
       elif escolha_comprovante == 3 :
@@ -233,48 +259,41 @@ def alterar() : #menu alterar
       limpar()
       traco()
       print("O que você deseja alterar? :\n"
-      f"1. Cpf: {cpf_lista[-1]}\n"
-      f"2. Nome: {nome_lista[-1]}\n"
-      f"3. Número da conta: {numero_conta_lista[-1]}\n"
+      f"1. Nome: {pessoa[0]}\n"
+      f"2. Cpf: {pessoa[1]}\n"  
+      f"3. Número da conta: {pessoa[3]}\n"
       "4. voltar para o menu principal"
       )
       e = escolha() 
       if e == 1 :
-            new_cpf()                      
-      elif e == 2 : 
-            new_nome()
+            new_nome()                   
+      elif e == 2 :         
+            new_cpf() 
       elif e == 3 :
             new_Nconta()
       elif e == 4 :
-            menu_principal()         
-def new_cpf() : #inicio das funções do menu alterar.
+            menu_principal() 
+
+def new_nome() :#inicio das funções do menu alterar.
       limpar()
-      cpf_lista[-1] = novo_cpf = int(input("digite seu novo cpf")) 
-      print("PARABÉNS, VOCÊ ATUALIZOU SEU CPF") 
-      time.sleep(3)
-      alterar()  
-def new_nome() :
-      limpar()
-      nome_lista[-1] = novo_nome = input("digite seu novo nome")
+      pessoa[0] = novo_nome = input("digite seu novo nome")
       print("PARABÉNS, VOCÊ ATUALIZOU SEU NOME")
       time.sleep(3)
       alterar()
+def new_cpf() :
+      limpar()
+      pessoa[1] = novo_cpf = int(input("digite seu novo cpf")) 
+      print("PARABÉNS, VOCÊ ATUALIZOU SEU CPF") 
+      time.sleep(3)
+      alterar()  
+
 def new_Nconta():
       limpar()
-      numero_conta_lista[-1] = novo_numero = int(input("digite  seu novo número da conta"))
+      pessoa[3] = novo_numero = int(input("digite  seu novo número da conta"))
       print("PARABÉNS, VOCÊ ATUALIZOU SEU NÚMERO DA CONTA")
       time.sleep(3)
       alterar()
-def resetar(a,b,c,d,e):#função resetar para não bugar o comprovante de outro usuário
-      if len(a) > 0 :
-            a.clear()
-            b.clear()
-            c.clear()
-            d.clear()
-            e.clear()
-            menu_cadastro()
-      else :
-            menu_cadastro()
+
 def excluir(a,b,c,d,e):
       if len(a) > 0 :
             a.pop()
@@ -289,13 +308,8 @@ def excluir(a,b,c,d,e):
             menu_principal()      
 def sairConta():#funções sair conta e sair do banco
       limpar()
-      print(f"Saindo da sua conta,{nome_lista[-1]}")
+      print(f"Saindo da sua conta,{pessoa[0]}")
       time.sleep(3)
-      comprovante_depo.append(valor_deposito.copy())
-      comprovante_depo.append(data_deposito_lista.copy())
-      comprovante_pix.append(valor_pix_lista.copy())
-      comprovante_pix.append(destinatario_lista.copy())
-      comprovante_pix.append(data_pix_lista.copy())
       limpar()
       iniciar()
 def sair():
@@ -305,3 +319,4 @@ def sair():
       limpar()
       exit()
 iniciar()      
+ 
