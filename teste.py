@@ -16,7 +16,7 @@ def escolha():
     return guia
 
 def limpar():
-    os.system('cls') or None
+    os.system('cls')
 
 def iniciar():
     limpar()
@@ -88,8 +88,25 @@ def menu_principal():
     c = escolha()
     if c == '1' : # menu do inserir
         inserir()
-    elif c == '2' :# menu  alterar, deixar os comprovantes pix e deposito aqui, porém ainda deixa-los lá.
-        print('calma')
+    elif c == '2' :# menu  alterar inser
+        print('='*40)
+        print(f"{'ATUALIZAR INFORMAÇÕES':^40}")
+        print('='*40)
+        print('''
+        1. NOME
+        2. CPF      
+        ''')
+        trocar = ' '
+        while trocar not in '12':
+            trocar = input('Sua escolha: (1/2) ')
+        if trocar == '1':
+            pessoas[posi][0] = input('Novo Nome: ')
+            input('Quando quiser ')
+            menu_principal()
+        else: 
+            pessoas[posi][1] = input('Novo cpf: ')        
+            input('Quando quiser ')
+            menu_principal()
     elif c == '3' : # menu consultar
         limpar()
         traco()
@@ -135,9 +152,10 @@ def inserir():
         menu_principal() 
     traco() 
 
-def pix(): # 1 opção do menu inserir
+def pix(): # 1° opção do menu inserir
     limpar()
     traco()
+    # ei, coloca a verificação ae pae
     destinatario = input("Digite a chave pix do destinatário(a): ")
     if destinatario == pessoas[posi][1]:
         print('Você digitou o número da sua conta, se quiser depositar, vá à segunda guia do menu "inserir"')
@@ -153,7 +171,7 @@ def pix(): # 1 opção do menu inserir
                     transacao[posi][0]['Destinatário'].append(destinatario)
                     transacao[posi][0]['Data'].append(datetime.now())                        
                     pessoas[posi][2] -= valor_pix           
-                    print(f"PIX NO DE {valor_pix} FOI ENVIADO PARA {destinatario} POR {pessoas[posi][1]} NA DATA {datetime.now()}")
+                    print(f"PIX NO DE {valor_pix} FOI ENVIADO PARA {destinatario} POR {pessoas[posi][1]} NA DATA {datetime.now().hour}")
                     print(f"AGORA, VOCÊ POSSUI {pessoas[posi][2]} REAIS")
                     input('NO SEU TEMPO, MEU NOBRE! ')
                     inserir()         
@@ -169,7 +187,7 @@ def pix(): # 1 opção do menu inserir
             inserir()             
     traco()
 
-def depositar(): # 2 opção do menu inserir
+def depositar(): # 2° opção do menu inserir
     limpar()
     traco()
     deposito = float(input("Digite o valor do seu depósito: ")) 
@@ -245,4 +263,3 @@ for i in tra[0][0].values():
     
     
     '''
-   
