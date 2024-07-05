@@ -1,6 +1,4 @@
 from datetime import datetime
-from random import randrange
-import random
 import time
 import os
 import sys
@@ -13,7 +11,6 @@ def traco(x = 50):
 
 def escolha():
     guia = ' '
-    print('sasd')
     while guia not in '0123456789':
         guia = input('Sua escolha : (APENAS NÚMEROS) ') 
     return guia
@@ -54,8 +51,10 @@ def menu_cadastro():
     for posicao, valor  in enumerate(pessoas):
         if valor[1] == cpf:
             posi = posicao   
-    transacao.append([{'Valor':[],'Destinatário':[],'Data':[]},
-                      {}])                            
+    transacao.append([{'Valor':[],'Destinatário':[],'Data':[]},{'Valor_depo':[],'Data_depo':[]}]) 
+    if saldo > 0:
+        transacao[posi][1]['Valor_depo'].append(saldo)
+        transacao[posi][1]['Data_depo'].append(datetime.now())                           
     limpar()
     traco()
     print(
@@ -77,16 +76,15 @@ def menu_cadastro():
 def menu_principal():
     limpar()
     traco() 
-    print(
-        f"BEM-VINDO AO BANCO FÉLIX,{pessoas[posi][0]}\n"
-        '''MENU PRINCIPAL
-        1. INSERIR
-        2. ALTERAR
-        3. CONSULTAR
-        4. EXCLUIR CONTA
-        5. SAIR DA CONTA
-        6. SAIR DO BANCO'''
-        )
+    print(f"BEM-VINDO AO BANCO FÉLIX, {pessoas[posi][0]}\n"
+    '''MENU PRINCIPAL
+    1. INSERIR
+    2. ALTERAR
+    3. CONSULTAR
+    4. EXCLUIR CONTA
+    5. SAIR DA CONTA
+    6. SAIR DO BANCO'''
+    )
     c = escolha()
     if c == '1' : # menu do inserir
         inserir()
@@ -130,11 +128,9 @@ def inserir():
     if d == '1' : # opção de enviar pix
         pix()
     elif d == '2' :
-        print('depo')
-        #depositar()
+        depositar()
     elif d == '3' :
-        print('conpo')
-        #comprovante()
+        extrato()
     elif d == '4' :
         menu_principal() 
     traco() 
@@ -148,7 +144,7 @@ def pix(): # 1 opção do menu inserir
         input('Quando você quiser: ')
         inserir()
     else :      
-        valor_pix =  float(input("Digite o valor do pix")) 
+        valor_pix =  float(input("Digite o valor do pix: ")) 
         if valor_pix > 0 :             
             enviar = input("Deseja enviar? ")
             if pessoas[posi][2] >= valor_pix :
@@ -172,27 +168,67 @@ def pix(): # 1 opção do menu inserir
             input('No seu tempo: ')
             inserir()             
     traco()
-'''
+
 def depositar(): # 2 opção do menu inserir
     limpar()
     traco()
-    deposito = float(input("Digite o valor do seu depósito"))
-    valor_deposito.append(deposito) 
-    deposita = input(f"Deseja depositar {valor_deposito[-1]} reais?")
-    if deposita.lower() == "sim":
-        deposito_data = datetime.now()                   
-        data_deposito_lista.append(deposito_data)
-        # pessoa[2] = saldo_lista[2] + valor_deposito[-1]
-        print(f"PARABÉNS, VOCÊ DEPOSITOU {valor_deposito[-1]} REAIS EM {data_deposito_lista[-1]}")
-        print(f"AGORA, VOCÊ TEM {pessoa[2]} REAIS")
-        time.sleep(5)
+    deposito = float(input("Digite o valor do seu depósito: ")) 
+    depositar = input(f"Deseja depositar {deposito} reais? ")
+    if depositar.lower() == "sim":
+        horario = datetime.now()
+        transacao[posi][1]['Valor_depo'].append(deposito)
+        transacao[posi][1]['Data_depo'].append(horario)
+        pessoas[posi][2] += deposito
+        print(f"PARABÉNS, VOCÊ DEPOSITOU {deposito} REAIS EM {horario.hour} HORAS E {horario.minute} MINUTOS")
+        print(f"AGORA, VOCÊ TEM {pessoas[posi][2]} REAIS")
+        input("Quando quiser, meu comandante :D ")
         inserir()
-    elif deposita.lower() == "não":
-        valor_deposito.pop()
+    elif depositar.lower() == "não":     
         print("TENTE FAZER OUTRO DEPÓSITO OU OUTRA COISA :)")
-        time.sleep(5)
+        input("No seu tempo, meu nobre :) ")
         inserir()
-    traco()'''          
+    traco()  
+def extrato():# 3 opção do menu inserir
+    limpar()
+    traco()
+    print("BEM-VINDO AOS COMPROVANTES\n"
+        "1.COMPROVANTES PIX\n"
+        "2.COMPROVANTES DEPÓSITOS\n"
+        "3.Voltar para o menu inserir"
+        )
+    escolha_comprovante = escolha()
+    if  escolha_comprovante == '1' :
+        limpar()
+        print('='*40)
+        print(f"{'PIX':^40}")
+        print('='*40)
+        print('Valores: ',end='')
+        for valores_pix in transacao[posi][0]['Valor']:
+            print(valores_pix,end='  ')
+        print('\nDestinatários: ',end='')
+        for destinatarios_pix in transacao[posi][0]['Destinatário']:
+            print(destinatarios_pix, end='  ') 
+        print('\nDatas: ',end='')             
+        for datas_pix in transacao[posi][0]['Data']:
+            print(f"{datas_pix.hour}h",end='  ') 
+        input('\nPode ir, chefe ')      
+        inserir()
+    elif  escolha_comprovante == '2' :
+        limpar()
+        print('='*40)
+        print(f"{'DEPÓSITOS':^40}")
+        print('='*40)
+        print(' Valores: ',end='')
+        for valores in transacao[posi][1]['Valor_depo']:
+            print(valores,end=',  ')
+        print('\n Datas: ',end='')  
+        for datas in transacao[posi][1]['Data_depo']:
+            print(f"{datas.hour}h ",end=',  ')  
+        input(' \n Ao seu comando, meu guerreiro ')                      
+        inserir()
+    elif escolha_comprovante == '3' :
+        inserir()      
+    traco()             
 iniciar() 
 '''   
 tra = []
