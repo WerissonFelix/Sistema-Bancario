@@ -1,5 +1,5 @@
 from datetime import datetime
-import time
+from time import sleep
 import os
 import sys
 pessoas = []
@@ -11,9 +11,10 @@ def traco(x = 50):
 
 def escolha():
     guia = ' '
-    while guia not in '0123456789':
-        guia = input('Sua escolha : (APENAS NÚMEROS) ') 
+    while guia not in '0123456':
+        guia = str(input('Sua escolha : (APENAS NÚMEROS) ')) 
     return guia
+
 
 def limpar():
     os.system('cls')
@@ -22,17 +23,18 @@ def iniciar():
     limpar()
     traco() 
     print('''
-        Bem-vindo ao banco Félix, comece escolhendo uma opção"
-        1.CADASTRAR
-        2.SAIR DO BANCO
-        '''
+    Bem-vindo ao banco Félix, comece escolhendo uma opção      
+    1.CADASTRAR
+    2.SAIR DO BANCO
+    '''
     )
     a = escolha()
     traco()
     if a == '1' :
         menu_cadastro()
     elif a == '2' :    
-        print('espera')
+        print('tchau')
+        
 def menu_cadastro():
     limpar()
     traco()  
@@ -41,7 +43,7 @@ def menu_cadastro():
     saldo = float(input("Quanto deseja depositar? "))
     if cpf in pessoas:
         print("Alguém já tem este cpf, tente com outro")
-        time.sleep(5)
+        sleep(5)
         menu_cadastro()
     else :
         pessoas.append([nome, cpf, saldo])
@@ -71,7 +73,7 @@ def menu_cadastro():
         print('espera')     
     elif b == 3 :
         print('espera')   
-    traco()
+  
     
 def menu_principal():
     limpar()
@@ -89,24 +91,28 @@ def menu_principal():
     if c == '1' : # menu do inserir
         inserir()
     elif c == '2' :# menu  alterar inser
+        limpar()
         print('='*40)
         print(f"{'ATUALIZAR INFORMAÇÕES':^40}")
         print('='*40)
         print('''
         1. NOME
-        2. CPF      
+        2. CPF
+        3. VOLTAR       
         ''')
         trocar = ' '
-        while trocar not in '12':
-            trocar = input('Sua escolha: (1/2) ')
+        while trocar not in '123':
+            trocar = input('Sua escolha: (1/2/3) ')
         if trocar == '1':
             pessoas[posi][0] = input('Novo Nome: ')
             input('Quando quiser ')
             menu_principal()
-        else: 
+        elif trocar == '2': 
             pessoas[posi][1] = input('Novo cpf: ')        
             input('Quando quiser ')
             menu_principal()
+        else:
+            menu_principal()   
     elif c == '3' : # menu consultar
         limpar()
         traco()
@@ -121,16 +127,30 @@ def menu_principal():
     elif c == '4' : 
         limpar()
         traco()
-        exclui = input("EXCLUIR CONTA?")
+        exclui = input("EXCLUIR CONTA? (sim/não) ")
         if exclui.lower() == "sim" :
-            exit()
+            print('Desativando conta')
+            sleep(3)
+            print('Tchau!')
+            iniciar()
         elif exclui.lower() == "não" :
             menu_principal()  
     elif c == '5' :
-        print('saiu da conta')
+        limpar()
+        traco()
+        print('Saindo da conta')
+        sleep(2)
+        print('Pronto')
+        sleep(1)
+        iniciar()      
     elif c == '6' :
-        print('fim')             
-    traco() 
+        limpar()
+        traco()
+        print('Saindo do banco')             
+        sleep(2)
+        print('Tchau!')
+  
+
 def inserir():
     limpar()
     traco()
@@ -150,7 +170,6 @@ def inserir():
         extrato()
     elif d == '4' :
         menu_principal() 
-    traco() 
 
 def pix(): # 1° opção do menu inserir
     limpar()
@@ -185,7 +204,6 @@ def pix(): # 1° opção do menu inserir
             print("Dgite um valor maior que 0 ") 
             input('No seu tempo: ')
             inserir()             
-    traco()
 
 def depositar(): # 2° opção do menu inserir
     limpar()
@@ -204,8 +222,8 @@ def depositar(): # 2° opção do menu inserir
     elif depositar.lower() == "não":     
         print("TENTE FAZER OUTRO DEPÓSITO OU OUTRA COISA :)")
         input("No seu tempo, meu nobre :) ")
-        inserir()
-    traco()  
+        inserir() 
+
 def extrato():# 3 opção do menu inserir
     limpar()
     traco()
@@ -219,16 +237,16 @@ def extrato():# 3 opção do menu inserir
         limpar()
         print('='*40)
         print(f"{'PIX':^40}")
-        print('='*40)
-        print('Valores: ',end='')
+        print('='*40)     
+        print(f"{'Valores':<14}",end=':')
         for valores_pix in transacao[posi][0]['Valor']:
-            print(valores_pix,end='  ')
-        print('\nDestinatários: ',end='')
+            print(f"{valores_pix:^13}",end='|')    
+        print(f"\n{'Destinatários'} ",end=':')        
         for destinatarios_pix in transacao[posi][0]['Destinatário']:
-            print(destinatarios_pix, end='  ') 
-        print('\nDatas: ',end='')             
+            print(f"{destinatarios_pix:^13}", end='|')   
+        print(f"\n{'Datas (HORAS)':<14}",end=':') 
         for datas_pix in transacao[posi][0]['Data']:
-            print(f"{datas_pix.hour}h",end='  ') 
+            print(f"{datas_pix.hour:^13}",end='|') 
         input('\nPode ir, chefe ')      
         inserir()
     elif  escolha_comprovante == '2' :
@@ -236,17 +254,16 @@ def extrato():# 3 opção do menu inserir
         print('='*40)
         print(f"{'DEPÓSITOS':^40}")
         print('='*40)
-        print(' Valores: ',end='')
+        print(f"{'Valores':<14}",end=':')
         for valores in transacao[posi][1]['Valor_depo']:
-            print(valores,end=',  ')
-        print('\n Datas: ',end='')  
+            print(f"{valores:^13}",end='|')
+        print(f"\n{'Datas':<14}",end=':')  
         for datas in transacao[posi][1]['Data_depo']:
-            print(f"{datas.hour}h ",end=',  ')  
+            print(f"{datas.hour:^13}",end='|')  
         input(' \n Ao seu comando, meu guerreiro ')                      
         inserir()
     elif escolha_comprovante == '3' :
         inserir()      
-    traco()             
 iniciar() 
 '''   
 tra = []
@@ -261,5 +278,17 @@ tra[0][0]['valor'].append(78989879)
 for i in tra[0][0].values():
     print(i)
     
+
+    tra = []
+tra.append([{'valor':[1,2,3],'Destinário':[12345678901,12345678901,12345678901],'Data':[13,14,15]},{}])
+print(f"{'Valores': <14}",end=':')
+for i in tra[0][0]['valor']:
+    print(f"{i:^11}",end='|')
+print(f"\n{'Destinatários'} ",end=':')        
+for i in tra[0][0]['Destinário']:
+    print(f"{i:^11}",end='|')
+print(f"\n{'Datas':<14}",end=':') 
+for i in tra[0][0]['Data']:
+    print(f"{i:^11}",end='|')
     
     '''
