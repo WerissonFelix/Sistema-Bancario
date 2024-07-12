@@ -9,12 +9,35 @@ def traco(x = 50):
         print("=", end="")
     print("\n")
 
-def escolha():
-    guia = ' '
-    while guia not in '0123456':
-        guia = str(input('Sua escolha : (APENAS NÚMEROS) ')) 
-    return guia
-
+def escolha(limite='123', txt='Sua escolha : (APENAS NÚMEROS) ', num = False):
+    if (num):
+        nome = ' '     
+        while True :
+            nome = str(input(f"{txt}"))
+            if len(nome) > 0:
+                if nome[0] in limite:
+                    try:
+                        nome = float(nome)
+                        break
+                    except ValueError:
+                        print('Erro, digite apenas números! ')
+                        sleep(3)
+                        continue
+                else:
+                    print('Apenas números! ')
+            else:
+                continue
+        return nome
+    else:
+        guia = ' '
+        while True:
+            guia = str(input(txt)).upper().strip() 
+            if len(guia) > 0:
+                if guia[0] in limite:
+                    break
+            else:
+                continue        
+        return guia
 
 def limpar():
     os.system('cls')
@@ -24,30 +47,62 @@ def iniciar():
     traco() 
     print('''
     Bem-vindo ao banco Félix, comece escolhendo uma opção      
-    1.CADASTRAR
-    2.SAIR DO BANCO
+    1.ENTRAR
+    2.CADASTRAR
+    3.SAIR DO BANCO
     '''
     )
-    a = escolha()
-    traco()
+    a = escolha('123')
     if a == '1' :
+        entrar()
+    elif a == '2':
         menu_cadastro()
-    elif a == '2' :    
+    elif a == '3' :    
         print('tchau')
-        
+        exit()
+def entrar():
+    if len(pessoas) == 0:
+        print('Ainda não há nenhuma conta para entrar ')
+        sleep(2)
+        iniciar()
+    else:    
+        nome = input('Nome da conta que deseja entrar: ')
+        cpf = input('Cpf: ')
+        for i in pessoas:
+            if nome in i and cpf in i:
+                print('Entrando')
+                sleep(3) 
+                global posi     
+                for posicao, valor  in enumerate(pessoas):
+                    if valor[1] == cpf:
+                        posi = posicao     
+                menu_principal()
+        else:
+            print('Nome/Cpf não existem. Tente novamente')
+            sleep(2)
+            iniciar()          
+
 def menu_cadastro():
     limpar()
-    traco()  
+    traco() 
     nome = input("Digite seu nome: ")
-    cpf = input("Digite seu cpf: ")
-    saldo = float(input("Quanto deseja depositar? "))
-    if cpf in pessoas:
-        print("Alguém já tem este cpf, tente com outro")
-        sleep(5)
-        menu_cadastro()
-    else :
-        pessoas.append([nome, cpf, saldo])
+    cpf = escolha('1234567890','Seu cpf (11 dígitos) : ')
+    while len(cpf) != 11:
+        cpf = escolha('1234567890','Cpf (11 dígitos) ')      
+    for i in pessoas:
 
+        if cpf == i[1]:
+            print("Alguém já tem este cpf, tente com outro")
+            sleep(5)
+            menu_cadastro()
+    saldo = escolha('SN','Quer depositar? (S/N) ')  
+    if saldo[0] == 'S':
+        saldo = escolha('123456789','Seu depósito: ',True)
+    else:
+        saldo = '0'
+        saldo = float(saldo)   
+    pessoas.append([nome, cpf, saldo])
+        
     global posi
 
     for posicao, valor  in enumerate(pessoas):
@@ -56,25 +111,8 @@ def menu_cadastro():
     transacao.append([{'Valor':[],'Destinatário':[],'Data':[]},{'Valor_depo':[],'Data_depo':[]}]) 
     if saldo > 0:
         transacao[posi][1]['Valor_depo'].append(saldo)
-        transacao[posi][1]['Data_depo'].append(datetime.now())                           
-    limpar()
-    traco()
-    print(
-        "\nAgora, para onde deseja ir?\n"
-        "1.MENU PRINCIPAL\n"
-        "2.SAIR DA CONTA\n"
-        "3.SAIR DO BANCO"
-        )
-    b = escolha() 
-    limpar()
-    if b == '1' :# menu principal
-        menu_principal()  
-    elif b == '2':
-        print('espera')     
-    elif b == 3 :
-        print('espera')   
-  
-    
+        transacao[posi][1]['Data_depo'].append(datetime.now())                                 
+    menu_principal()
 def menu_principal():
     limpar()
     traco() 
@@ -87,7 +125,7 @@ def menu_principal():
     5. SAIR DA CONTA
     6. SAIR DO BANCO'''
     )
-    c = escolha()
+    c = escolha('123456')
     if c == '1' : # menu do inserir
         inserir()
     elif c == '2' :# menu  alterar inser
@@ -148,9 +186,8 @@ def menu_principal():
         traco()
         print('Saindo do banco')             
         sleep(2)
-        print('Tchau!')
+        exit()
   
-
 def inserir():
     limpar()
     traco()
@@ -161,7 +198,7 @@ def inserir():
     3.VER EXRATO
     4.VOLTAR PARA O MENU PRINCIPAL'''
     )
-    d = escolha()
+    d = escolha('1234')
     if d == '1' : # opção de enviar pix
         pix()
     elif d == '2' :
@@ -174,18 +211,35 @@ def inserir():
 def pix(): # 1° opção do menu inserir
     limpar()
     traco()
-    # ei, coloca a verificação ae pae
-    destinatario = input("Digite a chave pix do destinatário(a): ")
+    # ei, coloca a soma do pix na conta do destinatário (não esqueça)
+    destinatario = ' '
+    veridico = False
+    while True :
+        destinatario = escolha('1234567890','Digite a chave pix do destinatário (cpf) ')    
+        if len(destinatario) != 11:
+            print('Digite apenas 11 dígitos ')
+            continue
+        else:
+            for i in pessoas:
+                for j in i:
+                    if destinatario == j:
+                        print(f"Destinatário encontrado: {i[0]} ")   
+                        veridico = True 
+            if veridico == False:
+                print(f"O cpf {destinatario} não foi encontrado/não existe. ")
+                input('Quando quiser ')
+                inserir()
+            break   
     if destinatario == pessoas[posi][1]:
         print('Você digitou o número da sua conta, se quiser depositar, vá à segunda guia do menu "inserir"')
         input('Quando você quiser: ')
         inserir()
-    else :      
-        valor_pix =  float(input("Digite o valor do pix: ")) 
-        if valor_pix > 0 :             
-            enviar = input("Deseja enviar? ")
+    else :    
+        valor_pix = escolha('123456789.','Digite o valor do pix: ', True)  
+        if valor_pix > 0 :      
+            enviar = escolha('SN','Deseja enviar? (S/N) ')       
             if pessoas[posi][2] >= valor_pix :
-                if enviar.lower() == "sim":
+                if enviar[0] == "S":
                     transacao[posi][0]['Valor'].append(valor_pix)
                     transacao[posi][0]['Destinatário'].append(destinatario)
                     transacao[posi][0]['Data'].append(datetime.now())                        
@@ -194,23 +248,25 @@ def pix(): # 1° opção do menu inserir
                     print(f"AGORA, VOCÊ POSSUI {pessoas[posi][2]} REAIS")
                     input('NO SEU TEMPO, MEU NOBRE! ')
                     inserir()         
-                elif enviar.lower() == "não":
+                elif enviar[0] == "N":
+                    print('PIX CANCELADO!')
+                    sleep(3)
                     inserir()
             else : 
                 print(f"INFELIZMENTE, SEU SALDO NÃO É O SUFICIENTE. SALDO ATUAL: {pessoas[posi][2]} ") 
                 input('Quando quiser: ')
                 inserir()  
         else :
-            print("Dgite um valor maior que 0 ") 
+            print("Digite um valor maior que 0 ") 
             input('No seu tempo: ')
             inserir()             
 
 def depositar(): # 2° opção do menu inserir
     limpar()
     traco()
-    deposito = float(input("Digite o valor do seu depósito: ")) 
-    depositar = input(f"Deseja depositar {deposito} reais? ")
-    if depositar.lower() == "sim":
+    deposito = escolha('123456789.','Digite o valor do seu depósito', True)
+    depositar = escolha('SN',f'Deseja depositar {deposito} reais? ')
+    if depositar[0] == "S":
         horario = datetime.now()
         transacao[posi][1]['Valor_depo'].append(deposito)
         transacao[posi][1]['Data_depo'].append(horario)
@@ -219,7 +275,7 @@ def depositar(): # 2° opção do menu inserir
         print(f"AGORA, VOCÊ TEM {pessoas[posi][2]} REAIS")
         input("Quando quiser, meu comandante :D ")
         inserir()
-    elif depositar.lower() == "não":     
+    elif depositar[0] == "N":     
         print("TENTE FAZER OUTRO DEPÓSITO OU OUTRA COISA :)")
         input("No seu tempo, meu nobre :) ")
         inserir() 
@@ -232,7 +288,7 @@ def extrato():# 3 opção do menu inserir
         "2.COMPROVANTES DEPÓSITOS\n"
         "3.Voltar para o menu inserir"
         )
-    escolha_comprovante = escolha()
+    escolha_comprovante = escolha('123')
     if  escolha_comprovante == '1' :
         limpar()
         print('='*40)
@@ -265,30 +321,3 @@ def extrato():# 3 opção do menu inserir
     elif escolha_comprovante == '3' :
         inserir()      
 iniciar() 
-'''   
-tra = []
-tra.append([{'valor':(1,2,3),'Destinário':(123,432,743),'Data':(13,14,15)},{}])
-for oi, bom in tra[0][0].items():
-    print(oi)
-    print(bom)
-
-tra = []
-tra.append([{'valor':[1,2,3],'Destinário':[123,432,743],'Data':[13,14,15]},{}])
-tra[0][0]['valor'].append(78989879)
-for i in tra[0][0].values():
-    print(i)
-    
-
-    tra = []
-tra.append([{'valor':[1,2,3],'Destinário':[12345678901,12345678901,12345678901],'Data':[13,14,15]},{}])
-print(f"{'Valores': <14}",end=':')
-for i in tra[0][0]['valor']:
-    print(f"{i:^11}",end='|')
-print(f"\n{'Destinatários'} ",end=':')        
-for i in tra[0][0]['Destinário']:
-    print(f"{i:^11}",end='|')
-print(f"\n{'Datas':<14}",end=':') 
-for i in tra[0][0]['Data']:
-    print(f"{i:^11}",end='|')
-    
-    '''
