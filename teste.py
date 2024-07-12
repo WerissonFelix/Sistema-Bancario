@@ -1,5 +1,6 @@
 from datetime import datetime
 from time import sleep
+import platform
 import os
 import sys
 pessoas = []
@@ -9,7 +10,7 @@ def traco(x = 50):
         print("=", end="")
     print("\n")
 
-def escolha(limite='123', txt='Sua escolha : (APENAS NÚMEROS) ', num = False):
+def escolha(limite='123', txt='Sua escolha : (APENAS NÚMEROS) ', num = False, tamanho = 1):
     if (num):
         nome = ' '     
         while True :
@@ -33,14 +34,21 @@ def escolha(limite='123', txt='Sua escolha : (APENAS NÚMEROS) ', num = False):
         while True:
             guia = str(input(txt)).upper().strip() 
             if len(guia) > 0:
-                if guia[0] in limite:
-                    break
+                if tamanho > 1:
+                    if guia[0] in limite and len(guia) == tamanho:
+                        break
+                else:    
+                    if guia[0] in limite:
+                        break
             else:
                 continue        
         return guia
 
 def limpar():
-    os.system('cls')
+    if platform.system() == 'Windows':
+        os.sistem('cls')
+    elif platform.system() == 'Linux':
+        print("\n" * os.get_terminal_size().lines) 
 
 def iniciar():
     limpar()
@@ -66,6 +74,7 @@ def entrar():
         sleep(2)
         iniciar()
     else:    
+        # concerta esse nome e cpf 
         nome = input('Nome da conta que deseja entrar: ')
         cpf = input('Cpf: ')
         for i in pessoas:
@@ -86,9 +95,9 @@ def menu_cadastro():
     limpar()
     traco() 
     nome = input("Digite seu nome: ")
-    cpf = escolha('1234567890','Seu cpf (11 dígitos) : ')
+    cpf = escolha('1234567890','Seu cpf (11 dígitos) : ', tamanho= 11)
     while len(cpf) != 11:
-        cpf = escolha('1234567890','Cpf (11 dígitos) ')      
+        cpf = escolha('1234567890','Cpf (11 dígitos) ', tamanho =11)      
     for i in pessoas:
 
         if cpf == i[1]:
@@ -187,7 +196,7 @@ def menu_principal():
         print('Saindo do banco')             
         sleep(2)
         exit()
-  
+
 def inserir():
     limpar()
     traco()
@@ -213,6 +222,7 @@ def pix(): # 1° opção do menu inserir
     traco()
     # ei, coloca a soma do pix na conta do destinatário (não esqueça)
     destinatario = ' '
+    posi_desti = 0
     veridico = False
     while True :
         destinatario = escolha('1234567890','Digite a chave pix do destinatário (cpf) ')    
@@ -221,9 +231,10 @@ def pix(): # 1° opção do menu inserir
             continue
         else:
             for i in pessoas:
-                for j in i:
-                    if destinatario == j:
+                for valor in i:
+                    if destinatario == valor:
                         print(f"Destinatário encontrado: {i[0]} ")   
+                        posi_desti = pessoas.index(i)
                         veridico = True 
             if veridico == False:
                 print(f"O cpf {destinatario} não foi encontrado/não existe. ")
@@ -243,7 +254,8 @@ def pix(): # 1° opção do menu inserir
                     transacao[posi][0]['Valor'].append(valor_pix)
                     transacao[posi][0]['Destinatário'].append(destinatario)
                     transacao[posi][0]['Data'].append(datetime.now())                        
-                    pessoas[posi][2] -= valor_pix           
+                    pessoas[posi][2] -= valor_pix
+                    pessoas[posi_desti][2] += valor_pix           
                     print(f"PIX NO DE {valor_pix} FOI ENVIADO PARA {destinatario} POR {pessoas[posi][1]} NA DATA {datetime.now().hour}")
                     print(f"AGORA, VOCÊ POSSUI {pessoas[posi][2]} REAIS")
                     input('NO SEU TEMPO, MEU NOBRE! ')
@@ -321,3 +333,4 @@ def extrato():# 3 opção do menu inserir
     elif escolha_comprovante == '3' :
         inserir()      
 iniciar() 
+
