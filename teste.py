@@ -2,7 +2,7 @@ from datetime import datetime
 from time import sleep
 import platform
 import os
-import sys
+
 pessoas = []
 transacao = []
 def traco(x = 50):
@@ -46,7 +46,7 @@ def escolha(limite='123', txt='Sua escolha : (APENAS NÚMEROS) ', num = False, t
 
 def limpar():
     if platform.system() == 'Windows':
-        os.sistem('cls')
+        os.system('cls')
     elif platform.system() == 'Linux':
         print("\n" * os.get_terminal_size().lines) 
 
@@ -75,10 +75,12 @@ def entrar():
         iniciar()
     else:    
         # concerta esse nome e cpf 
-        nome = input('Nome da conta que deseja entrar: ')
-        cpf = input('Cpf: ')
+        num_conta = int(escolha('1234567890','Número da conta: '))
+        cpf = ' '
+        while len(cpf) != 11:
+            cpf = escolha('1234567890','Cfp da conta: ',tamanho=11)
         for i in pessoas:
-            if nome in i and cpf in i:
+            if num_conta in i and cpf in i:
                 print('Entrando')
                 sleep(3) 
                 global posi     
@@ -109,7 +111,7 @@ def menu_cadastro():
         saldo = escolha('123456789','Seu depósito: ',True)
     else:
         saldo = '0'
-        saldo = float(saldo)   
+        saldo = float(saldo)       
     pessoas.append([nome, cpf, saldo])
         
     global posi
@@ -117,6 +119,7 @@ def menu_cadastro():
     for posicao, valor  in enumerate(pessoas):
         if valor[1] == cpf:
             posi = posicao   
+    pessoas[posi].insert(3,posi)        
     transacao.append([{'Valor':[],'Destinatário':[],'Data':[]},{'Valor_depo':[],'Data_depo':[]}]) 
     if saldo > 0:
         transacao[posi][1]['Valor_depo'].append(saldo)
@@ -166,7 +169,8 @@ def menu_principal():
         print("INFORMAÇÕES DA CONTA :\n"
         f"NOME: {pessoas[posi][0]}\n"
         f"CPF: {pessoas[posi][1]}\n"            
-        f"SALDO BANCÁRIO: {pessoas[posi][2]}\n"           
+        f"SALDO BANCÁRIO: {pessoas[posi][2]}\n"
+        f"Número DA CONTA: {pessoas[posi][3]}"           
         )
         input('Quando quiser ')
         traco()
@@ -220,7 +224,6 @@ def inserir():
 def pix(): # 1° opção do menu inserir
     limpar()
     traco()
-    # ei, coloca a soma do pix na conta do destinatário (não esqueça)
     destinatario = ' '
     posi_desti = 0
     veridico = False
@@ -256,7 +259,7 @@ def pix(): # 1° opção do menu inserir
                     transacao[posi][0]['Data'].append(datetime.now())                        
                     pessoas[posi][2] -= valor_pix
                     pessoas[posi_desti][2] += valor_pix           
-                    print(f"PIX NO DE {valor_pix} FOI ENVIADO PARA {destinatario} POR {pessoas[posi][1]} NA DATA {datetime.now().hour}")
+                    print(f"PIX NO DE {valor_pix} FOI ENVIADO PARA {destinatario} POR {pessoas[posi][1]} NO HORÁRIO:  {datetime.now().hour} h  ")
                     print(f"AGORA, VOCÊ POSSUI {pessoas[posi][2]} REAIS")
                     input('NO SEU TEMPO, MEU NOBRE! ')
                     inserir()         
@@ -333,4 +336,3 @@ def extrato():# 3 opção do menu inserir
     elif escolha_comprovante == '3' :
         inserir()      
 iniciar() 
-
